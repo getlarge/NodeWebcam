@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/courget/NodeWebcam.png?label=ready&title=Ready)](https://waffle.io/courget/NodeWebcam?utm_source=badge)
 # BIODIAG - NODE WEBCAM
 
 ## Requirements
