@@ -3,10 +3,10 @@
 #define OTA_BUTTON_PIN D3
 
 bool resetConfig = false; // set to true to reset FS and Wifimanager, don't forget to set this to false after
-bool softResetConfig= false;
+bool wifiResetConfig= false;
 
 char devicePass[30]="motdepasse", deviceId[20], devicePrefix[10] = "camera";
-char mqtt_client[60], mqtt_user[20], mqtt_password[30], mqtt_server[40], mqtt_port[6], http_port[6]; 
+char mqtt_client[60], mqtt_user[20], mqtt_password[30], mqtt_server[40], mqtt_port[6], http_server[40], http_port[6]; 
 char mqtt_topic_out[70], mqtt_topic_in[70], out[10]= "-out", in[10]= "-in/#";
 char post_prefix[10] = "/cam/", post_destination[70]; 
 int mqttPort, httpPort;
@@ -18,13 +18,14 @@ const char* mqttTopicOut;
 const char* mqttTopicIn;
 const char *postDestination;
 const char *httpServer;
-const char* otaUrl = "https://dr.courget.com/firmware/node_webcam.ino.bin";
+const char* otaUrl = "https://dr.courget.com/firmware/NodeWebcam.ino.bin";
 
 WiFiManagerParameter custom_mqtt_server("server", "mqtt server", mqtt_server, 40);
 WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 6);
 WiFiManagerParameter custom_mqtt_client("client", "mqtt client", mqtt_client, 60);
 WiFiManagerParameter custom_mqtt_user("user", "mqtt user", mqtt_user, 20);
 WiFiManagerParameter custom_mqtt_password("password", "mqtt password", mqtt_password, 30);
+WiFiManagerParameter custom_http_server("httpServer", "http server", http_server, 40);
 WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
 
 unsigned long lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0, lastNtpReconnectAttempt = 0;

@@ -85,6 +85,7 @@ void before() {
           strcpy(mqtt_client, json["mqtt_client"]);
           strcpy(mqtt_user, json["mqtt_user"]);
           strcpy(mqtt_password, json["mqtt_password"]);
+          strcpy(http_server, json["http_server"]);
           strcpy(http_port, json["http_port"]);
           strcpy(mqtt_topic_in,mqtt_client); 
           strcat(mqtt_topic_in,in); 
@@ -99,7 +100,7 @@ void before() {
           mqttPassword = mqtt_password;
           mqttTopicIn = mqtt_topic_in;
           mqttTopicOut = mqtt_topic_out;
-          httpServer = mqtt_server;
+          httpServer = http_server;
           httpPort = atoi(http_port);
           postDestination = post_destination;
           Serial.println();
@@ -137,6 +138,7 @@ void before() {
   wifiManager.addParameter(&custom_mqtt_client);
   wifiManager.addParameter(&custom_mqtt_user);
   wifiManager.addParameter(&custom_mqtt_password);
+  wifiManager.addParameter(&custom_http_server);
   wifiManager.addParameter(&custom_http_port);
   wifiManager.setMinimumSignalQuality();  
   wifiManager.setConfigPortalTimeout(600);
@@ -147,7 +149,7 @@ void before() {
   strcpy(deviceId,devicePrefix); 
   strcat(deviceId,espChipId);
   
-  if (MqttClient.connected() || ((!MqttClient.connected()) && (WiFi.status() != WL_CONNECTED))) ) {
+  if ((MqttClient.connected()) || ((!MqttClient.connected()) && (WiFi.status() != WL_CONNECTED))) {
     wifiManager.startConfigPortal(deviceId, devicePass);
   }
   
@@ -166,6 +168,7 @@ void before() {
     strcpy(mqtt_client, custom_mqtt_client.getValue()); 
     strcpy(mqtt_user, custom_mqtt_user.getValue());
     strcpy(mqtt_password, custom_mqtt_password.getValue());
+    strcpy(http_server, custom_http_server.getValue()); 
     strcpy(http_port, custom_http_port.getValue());
     Serial.println("Saving config");
     DynamicJsonBuffer jsonBuffer;
@@ -175,6 +178,7 @@ void before() {
     json["mqtt_client"] = mqtt_client;
     json["mqtt_user"] = mqtt_user;
     json["mqtt_password"] = mqtt_password;
+    json["http_server"] = http_server;
     json["http_port"] = http_port;
     strcpy(mqtt_topic_in,mqtt_client);
     strcat(mqtt_topic_in,in);
@@ -189,7 +193,7 @@ void before() {
     mqttPassword = mqtt_password;
     mqttTopicIn = mqtt_topic_in;
     mqttTopicOut = mqtt_topic_out;
-    httpServer = mqtt_server;
+    httpServer = http_server;
     httpPort = atoi(http_port);
     postDestination = post_destination;
     File configFile = SPIFFS.open("/config.json", "w");
@@ -234,7 +238,7 @@ void setup() {
       delay(1000);
   }
   
-  if (softResetConfig) { // rajouter un bouton
+  if (wifiResetConfig) { // rajouter un bouton
     WiFiManager wifiManager;
     wifiManager.resetSettings();
   }
