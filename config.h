@@ -1,11 +1,21 @@
-#define BAUD_RATE 115200
+/**********************************
+ * Sketch configuration
+ */
 
+#define SKETCH_NAME "NodeWebcam"
+#define SKETCH_VERSION "1.0"
+
+/**********************************
+ * MySensors gateway configuration
+ */
+ 
+#define MY_DEBUG
+#define MY_BAUD_RATE 115200
 #define OTA_BUTTON_PIN D3
 
-bool resetConfig = false; // set to true to reset FS and Wifimanager, don't forget to set this to false after
-bool wifiResetConfig= false;
+bool resetConfig = false, wifiResetConfig = false; // set to true to reset FS and/or Wifimanager, don't forget to set this to false after
 
-char devicePass[30]="motdepasse", deviceId[20], devicePrefix[10] = "camera";
+char devicePass[30]="motdepasse", deviceId[20], devicePrefix[10] = "Camera";
 char mqtt_client[60], mqtt_user[20], mqtt_password[30], mqtt_server[40], mqtt_port[6], http_server[40], http_port[6]; 
 char mqtt_topic_out[70], mqtt_topic_in[70], out[10]= "-out", in[10]= "-in/#";
 char post_prefix[10] = "/cam/", post_destination[70]; 
@@ -31,7 +41,9 @@ WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
 unsigned long lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0, lastNtpReconnectAttempt = 0;
 unsigned long lastUpdate=0, lastRequest=0, lastPic = 0;
 bool shouldSaveConfig = false, executeOnce = false, switchOnCam = false;
-int wifiCount = 0, mqttCount = 0;
+int wifiCount = 0, mqttCount = 0, wifiConfigMode = 0;
+unsigned long wifiConfigTime = 180;
+
 // set GPIO16 as the slave select :
 const int CS = 16;
 // if the video is chopped or distored, try using a lower value for the buffer

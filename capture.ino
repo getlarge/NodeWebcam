@@ -1,3 +1,6 @@
+///////////////////////////////////////////////////////////////////////////////////
+//    performing camera action and image posting      //
+///////////////////////////////////////////////////////////////////////////////////
 void Capture() {
   if (((millis() - lastPic) > minDelayBetweenframes) && (switchOnCam)) {
     lastPic = millis();
@@ -9,10 +12,10 @@ void Capture() {
     while (!myCAM.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK));
     size_t len = myCAM.read_fifo_length();
     if (len >= 0x07ffff) {
-        Serial.println("Over size.");
+        Serial.println(F("Over size."));
         return;
     }else if (len == 0 ) {
-        Serial.println("Size is 0.");
+        Serial.println(F("Size is 0."));
         return;
     }
     myCAM.CS_LOW();
@@ -21,7 +24,7 @@ void Capture() {
     SPI.transfer(0xFF);
     #endif
     digitalWrite(BUILTIN_LED, HIGH);
-    Serial.println("Ready to send capture");
+    Serial.println(F("Ready to send capture"));
     sendPic(len);
     myCAM.CS_HIGH();
     
@@ -37,7 +40,7 @@ void sendPic(int len) {
   //WiFiClientSecure httpClient;
   if (MqttWifiClient.connect(httpServer, httpPort)) {
   //if (httpClient.connect(url, httpPort)) {
-      Serial.print("Send ");
+      Serial.print(F("Send "));
       Serial.print(millis());
       String formStart;
       String formEnd;
@@ -96,7 +99,7 @@ void sendPic(int len) {
 //      Serial.print(str);
 //    }
       MqttWifiClient.stop();
-      Serial.println(" OK");
+      Serial.println(F("OK"));
   }
 }
 
