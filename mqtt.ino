@@ -1,17 +1,20 @@
+///////////////////////////////////////////////////////////////////////////////////
+//   handle mqtt init, connect, reconnect, callback      //
+///////////////////////////////////////////////////////////////////////////////////
 void mqttInit() {
   MqttClient.setServer(mqttServer, mqttPort);
   MqttClient.setCallback(mqttCallback);
   //MqttClient.connect((mqttClient),(mqttUser),(mqttPassword));
   //MqttClient.subscribe(mqttTopicIn);
-  Serial.println("Connecté au serveur MQTT : ");
+  Serial.println(F("Connected to MQTT server: "));
   Serial.println(mqttServer);
 }
 
 boolean connect() {
   //if (!client.connected()) {
-    Serial.println("Tentative de connexion MQTT...");
+    Serial.println(F("Attempting MQTT connection..."));
     if (MqttClient.connect((mqttClient),(mqttUser),(mqttPassword))) {
-      Serial.println("Connecté");
+      Serial.println(F("Connected to MQTT"));
       MqttClient.publish(mqttTopicOut, "Check 1-2 1-2");
       MqttClient.subscribe(mqttTopicIn);
     } 
@@ -20,19 +23,19 @@ boolean connect() {
 
 void mqttReconnect() { //blocking loop
   while (!MqttClient.connected()) {
-      Serial.print("Attempting MQTT connection...");
+      Serial.print(F("Attempting MQTT connection..."));
       if (MqttClient.connect(mqttClient, mqttUser, mqttPassword)) {
           lastMqttReconnectAttempt=0;
           mqttCount = 0;
-          Serial.println("connected");
+          Serial.println(F("Connected to MQTT"));
           delay(100);
           //MqttClient.publish(mqttTopicOut, "Check 1-2 1-2");
           MqttClient.subscribe(mqttTopicIn);
        }
        else {
-         Serial.print("failed, rc=");
+         Serial.print(F("failed, rc="));
          Serial.print(MqttClient.state());
-         Serial.println(" try again in 5 seconds");
+         Serial.println(F(" try again in 5 seconds"));
      //    ++mqttCount;
        }
 //       if (mqttCount == 5) {
@@ -46,9 +49,9 @@ void mqttReconnect() { //blocking loop
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
     payload[length] = '\0';
     String s = String((char*)payload);
-    Serial.print("Message arrived [");
+    Serial.print(F("Message arrived ["));
     Serial.print(topic);
-    Serial.print("] ");
+    Serial.print(F("] "));
     Serial.println(s);
 //    for (int i = 0; i < length; i++) {
 //    Serial.print((char)payload[i]);
@@ -61,9 +64,9 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
        switchOnCam = 1;
     }
     if (s == "1") {
-        t_httpUpdate_return  ret = ESPhttpUpdate.update(otaUrl);
+        t_httpUpdate_return  ret = ESPhttpUpdate.update(otaUrl,"");
         switch (ret) {
-          case HTTP_UPDATE_FAILED: // à corriger, blocking loop
+          case HTTP_UPDATE_FAILED: 
             Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
             Serial.println();
            // return;
