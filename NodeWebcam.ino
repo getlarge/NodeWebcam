@@ -54,6 +54,7 @@ void checkButton() {
   int value = debouncer.read();
   if (value == LOW) {
       Serial.println(F("Long push detected, ask for config"));
+      manualConfig = true;
       configManager();
   }
 }
@@ -313,12 +314,25 @@ if ( ! executeOnce) {
 
  if ( WiFi.status() != WL_CONNECTED) {
     ticker.attach(0.1, tick);
-    checkButton();
+    ++wifiFailCount;
+    if (wifiFailCount == 15) {
+      ticker.detach();
+      configManager();
+    }  
+  //checkButton();
   }
   
   if (!MqttClient.connected()) {
     ticker.attach(0.3, tick);
     checkButton();
     mqttReconnect();
+  }
+  
+  if ((!MqttClient.connected()) && (WiFi.status() == WL_CONNECTED)) {
+    ticker.detach();
+    wifiFailCount = 0;
+    if (BUILTIN_LED == LOW) {
+      digitalWrite(BUILTIN_LED, HIGH);
+    }
   }
 }

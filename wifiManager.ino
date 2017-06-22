@@ -4,7 +4,7 @@
 void configManager() {
   Serial.println(F("Wifi config mode opening"));
   ticker.attach(0.5, tick);
-  wifiCount++;
+  configCount++;
 //  debouncer2.attach(MY_INCLUSION_MODE_BUTTON_PIN);
 //  debouncer2.interval(5000);
   
@@ -40,12 +40,19 @@ void configManager() {
   wifiManager.addParameter(&custom_http_port);
 
   getDeviceId();
-  wifiConfigMode = 1;
-  
-if ((wifiCount > 1 && MqttClient.connected() && WiFi.status() == WL_CONNECTED) || (wifiCount > 1 && !MqttClient.connected() && WiFi.status() == WL_CONNECTED)) {
+  configMode = 1;
+
+   
+  if ((configCount > 1 && manualConfig == true)) {
     Serial.println(F("Manual config access"));
-    wifiManager.setConfigPortalTimeout(wifiConfigTime);
+    wifiManager.setConfigPortalTimeout(configTimeout);
     wifiManager.startConfigPortal(deviceId, devicePass); 
+  }
+  
+  if ((configCount > 1 && MqttClient.connected() && WiFi.status() == WL_CONNECTED) || (configCount > 1 && !MqttClient.connected() && WiFi.status() == WL_CONNECTED)) {
+    Serial.println(F("Manual config access"));
+    wifiManager.setConfigPortalTimeout(configTimeout);
+    wifiManager.autoConnect(deviceId, devicePass); 
   }
   
   else if (!wifiManager.autoConnect(deviceId, devicePass)) {
@@ -57,7 +64,7 @@ if ((wifiCount > 1 && MqttClient.connected() && WiFi.status() == WL_CONNECTED) |
   }
 
   Serial.print(F("Config mode counter : "));
-  Serial.println(wifiCount);
+  Serial.println(configCount);
   Serial.println(F("Connected"));
   if (shouldSaveConfig) {
     strcpy(mqtt_server, custom_mqtt_server.getValue()); 
@@ -103,7 +110,7 @@ if ((wifiCount > 1 && MqttClient.connected() && WiFi.status() == WL_CONNECTED) |
   }
 
   Serial.println(F("Wifi config mode closed"));
-  wifiConfigMode = 0;
+  configMode = 0;
   ticker.detach();
   digitalWrite(BUILTIN_LED, HIGH);
   

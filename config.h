@@ -6,8 +6,9 @@
 #define SKETCH_VERSION "1.0"
 
 /**********************************
- * MySensors gateway configuration
+ * Global configuration
  */
+ 
  
 #define MY_DEBUG
 #define MY_BAUD_RATE 115200
@@ -38,11 +39,11 @@ WiFiManagerParameter custom_mqtt_password("password", "mqtt password", mqtt_pass
 WiFiManagerParameter custom_http_server("httpServer", "http server", http_server, 40);
 WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
 
-unsigned long lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0, lastNtpReconnectAttempt = 0;
+unsigned long lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0;
 unsigned long lastUpdate=0, lastRequest=0, lastPic = 0;
-bool shouldSaveConfig = false, executeOnce = false, switchOnCam = false;
-int wifiCount = 0, mqttCount = 0, wifiConfigMode = 0;
-unsigned long wifiConfigTime = 180;
+bool shouldSaveConfig = false, executeOnce = false, switchOnCam = false,  manualConfig = false;
+int configCount = 0, wifiFailCount = 0, mqttCount = 0, configMode = 0;
+unsigned long configTimeout = 180;
 
 // set GPIO16 as the slave select :
 const int CS = 16;
@@ -61,5 +62,4 @@ String errMsg = "";
 int resolution = 4;
 int minDelayBetweenframes, interval1 = 5000; 
 int fpm = 0;
-
 
