@@ -21,28 +21,25 @@ boolean connect() {
       return MqttClient.connected();
 }
 
-void mqttReconnect() { //blocking loop
-  while (!MqttClient.connected()) {
-      Serial.print(F("Attempting MQTT connection..."));
+bool mqttReconnect() { //blocking loop
+//  while (!MqttClient.connected()) {
+    if (!MqttClient.connected()) {
+      Serial.println(F("====== Attempting MQTT connection... ========="));
       if (MqttClient.connect(mqttClient, mqttUser, mqttPassword)) {
           lastMqttReconnectAttempt=0;
-          mqttCount = 0;
+          mqttFailCount = 0;
           Serial.println(F("Connected to MQTT"));
           delay(100);
           //MqttClient.publish(mqttTopicOut, "Check 1-2 1-2");
           MqttClient.subscribe(mqttTopicIn);
+         // if (configMode ==1) break;
        }
        else {
          Serial.print(F("failed, rc="));
          Serial.print(MqttClient.state());
          Serial.println(F(" try again in 5 seconds"));
-     //    ++mqttCount;
+         ++mqttFailCount;
        }
-//       if (mqttCount == 5) {
-//         Serial.println("Connexion MQTT infructueuse après 5 essais --> mode config");
-//         lastMqttReconnectAttempt = 0;
-//         mqttCount = 0;
-//       }
   } 
 }
 
@@ -64,20 +61,34 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
        switchOnCam = 1;
     }
     if (s == "1") {
-        t_httpUpdate_return  ret = ESPhttpUpdate.update(otaUrl,"");
-        switch (ret) {
-          case HTTP_UPDATE_FAILED: 
-            Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-            Serial.println();
-           // return;
-            break;
+      if((WiFi.status() == WL_CONNECTED)) {          
+     // MqttClient.disconnect();
+     // MqttWifiClient.stop();
+     // delay(1000);
+      ESPhttpUpdate.rebootOnUpdate(true);
+      Serial.println(F("Update SPIFFS..."));
+      t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs(otaUrl, "", httpsFingerprint);
+    //  t_httpUpdate_return ret = ESPhttpUpdate.update(otaUrl, "", httpsFingerprint);      
+
+     // if(ret == HTTP_UPDATE_OK) {
+     //   Serial.println(F("Update sketch..."));
+     //   ret = ESPhttpUpdate.update(otaUrl, "", httpsFingerprint);      
+     // ret = ESPhttpUpdate.update(host, httpsPort, url, currentVersion, httpsFingerprint);
+        switch(ret) {
+          case HTTP_UPDATE_FAILED:
+              Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+              Serial.println();
+              break;
+
           case HTTP_UPDATE_NO_UPDATES:
-            Serial.println(F("HTTP_UPDATE_NO_UPDATES"));
-            break;
+              Serial.println(F("HTTP_UPDATE_NO_UPDATES"));
+              break;
+
           case HTTP_UPDATE_OK:
-            Serial.println(F("HTTP_UPDATE_OK"));
-            break;
+              Serial.println(F("HTTP_UPDATE_OK"));
+              break;
          }
+       }
      }
      if (s == "reso0") {
        setCamResolution(0);

@@ -12,9 +12,9 @@
  
 #define MY_DEBUG
 #define MY_BAUD_RATE 115200
-#define OTA_BUTTON_PIN D3
 
-bool resetConfig = false, wifiResetConfig = false; // set to true to reset FS and/or Wifimanager, don't forget to set this to false after
+#define OTA_BUTTON_PIN D3
+#define STATE_LED D4
 
 char devicePass[30]="motdepasse", deviceId[20], devicePrefix[10] = "Camera";
 char mqtt_client[60], mqtt_user[20], mqtt_password[30], mqtt_server[40], mqtt_port[6], http_server[40], http_port[6]; 
@@ -29,21 +29,15 @@ const char* mqttTopicOut;
 const char* mqttTopicIn;
 const char *postDestination;
 const char *httpServer;
-const char* otaUrl = "https://dr.courget.com/firmware/NodeWebcam.ino.bin";
+const char* otaUrl = "https://app.getlarge.eu/firmware/NodeWebcam.ino.bin";
+const char* currentVersion = "4712";
+const char* httpsFingerprint = "1D AE 00 E7 68 70 87 09 A6 1D 27 76 F5 85 C0 F3 AB F2 60 9F"; 
 
-WiFiManagerParameter custom_mqtt_server("server", "mqtt server", mqtt_server, 40);
-WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 6);
-WiFiManagerParameter custom_mqtt_client("client", "mqtt client", mqtt_client, 60);
-WiFiManagerParameter custom_mqtt_user("user", "mqtt user", mqtt_user, 20);
-WiFiManagerParameter custom_mqtt_password("password", "mqtt password", mqtt_password, 30);
-WiFiManagerParameter custom_http_server("httpServer", "http server", http_server, 40);
-WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
-
-unsigned long lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0;
+bool resetConfig = false, wifiResetConfig = false; // set to true to reset FS and/or Wifimanager, don't forget to set this to false after
+unsigned long configTimeout = 180, lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0;
 unsigned long lastUpdate=0, lastRequest=0, lastPic = 0;
-bool shouldSaveConfig = false, executeOnce = false, switchOnCam = false,  manualConfig = false;
-int configCount = 0, wifiFailCount = 0, mqttCount = 0, configMode = 0;
-unsigned long configTimeout = 180;
+bool shouldSaveConfig = false, executeOnce = false, switchOnCam = false, otaSignalReceived = false, manualConfig = false;
+int configCount = 0, wifiFailCount = 0, mqttFailCount = 0, configMode = 0, _otaSignal = 0;
 
 // set GPIO16 as the slave select :
 const int CS = 16;
@@ -53,6 +47,7 @@ static const size_t bufferSize = 2048; // 4096; //2048; //1024;
 static uint8_t buffer[bufferSize] = {0xFF}; // new? 
 
 static const int fileSpaceOffset = 700000;
+const String otaFile = "ota.txt";
 const String fName = "res.txt";
 const String f2Name = "fpm.txt";
 int fileTotalKB = 0;

@@ -7,7 +7,7 @@ void Capture() {
     digitalWrite(BUILTIN_LED, LOW);
     myCAM.clear_fifo_flag();
     myCAM.start_capture();
-    Serial.println(" Start capture");
+    Serial.println(F("Start capture"));
 
     while (!myCAM.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK));
     size_t len = myCAM.read_fifo_length();
@@ -23,7 +23,7 @@ void Capture() {
     #if !(defined (ARDUCAM_SHIELD_V2) && defined (OV2640_CAM))
     SPI.transfer(0xFF);
     #endif
-    digitalWrite(BUILTIN_LED, HIGH);
+    digitalWrite(STATE_LED, HIGH);
     Serial.println(F("Ready to send capture"));
     sendPic(len);
     myCAM.CS_HIGH();
