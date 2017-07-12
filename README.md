@@ -1,5 +1,5 @@
 [![Stories in Ready](https://badge.waffle.io/courget/NodeWebcam.png?label=ready&title=Ready)](https://waffle.io/courget/NodeWebcam?utm_source=badge)
-# BIODIAG - NODE WEBCAM
+# NODE WEBCAM
 
 ## Requirements
 
@@ -13,15 +13,16 @@ Packages for ESP8266 and ArduCAM development on Arduino IDE
 
 following libraries are required :
 
-- FS
-- WifiManager
 - ArduCAM
 - ArduinoJson
+- FS
+- Pubsubclient
+- WifiManager
 
 ## Installation
 
 ```
-git clone git@framagit.org:getlarge/node_webcam.git
+git clone https://github/getlarge/NodeWebcam.git
 ```
 
 Edit Arduino/libraries/ArduCAM/memorysaver.h to :
@@ -30,12 +31,7 @@ Edit Arduino/libraries/ArduCAM/memorysaver.h to :
 #define OV2640_MINI_2MP
 ```
 
-Then in `config.h.sample` file you may edit the following :
-
-- Name your device for your wifi router ( DHCP )
-```
-#define MY_ESP8266_HOSTNAME "your_device_name"
-```
+Then in `config.h` file you may edit the following :
 
 - Protect the acces point
 ```
@@ -45,11 +41,9 @@ char ap_pass[30]="yourpassword",
 ## Usage
 
 - Open any .ino file of the folder with Arduino IDE
-- Edit config.h.sample and copy without .sample extension 
-- Uncomment FS.Format the first time you upload
-- Comment out FS.format
-- Edit login and password in custom_capture.ino.sample and copy without .sample
-- Upload the code on the ArduCAM ESP8266 UNO board
+- Edit your preferences
+- Set resetConfig to true, to make FS format and wifiManager resetting
+- Upload the code on your ESP8266 board
 
 ## Reference
 
