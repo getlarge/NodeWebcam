@@ -34,7 +34,7 @@ const char* currentVersion = "4712";
 const char* httpsFingerprint = "1D AE 00 E7 68 70 87 09 A6 1D 27 76 F5 85 C0 F3 AB F2 60 9F"; 
 
 bool resetConfig = false, wifiResetConfig = false; // set to true to reset FS and/or Wifimanager, don't forget to set this to false after
-unsigned long configTimeout = 180, lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0;
+unsigned long configTimeout1 = 3000, configTimeout2 = 180, lastMqttReconnectAttempt = 0, lastWifiReconnectAttempt = 0;
 unsigned long lastUpdate=0, lastRequest=0, lastPic = 0;
 bool shouldSaveConfig = false, executeOnce = false, switchOnCam = false, otaSignalReceived = false, manualConfig = false;
 int configCount = 0, wifiFailCount = 0, mqttFailCount = 0, configMode = 0, _otaSignal = 0;
@@ -44,7 +44,7 @@ const int CS = 16;
 // if the video is chopped or distored, try using a lower value for the buffer
 // lower values will have fewer frames per second while streaming
 static const size_t bufferSize = 2048; // 4096; //2048; //1024;
-static uint8_t buffer[bufferSize] = {0xFF}; // new? 
+static uint8_t buffer[bufferSize] = {0xFF};
 
 static const int fileSpaceOffset = 700000;
 const String otaFile = "ota.txt";

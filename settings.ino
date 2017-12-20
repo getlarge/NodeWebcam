@@ -22,7 +22,7 @@ WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
 #ifndef MY_DEBUG 
   wifiManager.setDebugOutput(false);
 #endif
-  wifiManager.setAPCallback(configModeCallback);
+ // wifiManager.setAPCallback(configModeCallback);
 //  wifiManager.setBreakAfterConfig(true);
   wifiManager.setSaveConfigCallback(saveConfigCallback);
   wifiManager.setMinimumSignalQuality(10);
@@ -41,6 +41,7 @@ WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
   script += "});";
   script += "</script>";
   wifiManager.setCustomHeadElement(script.c_str());
+  
   wifiManager.addParameter(&custom_mqtt_server);
   wifiManager.addParameter(&custom_mqtt_port);
   wifiManager.addParameter(&custom_mqtt_client);
@@ -54,7 +55,7 @@ WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
  // When no credentials or asking ...
   if ((configCount > 1 && manualConfig == true) || ( mqttServer == "")) {
     Serial.println(F("Manual config access"));
-    wifiManager.setConfigPortalTimeout(configTimeout);
+    wifiManager.setConfigPortalTimeout(configTimeout1);
     //wifiManager.startConfigPortal(deviceId, devicePass);
     wifiManager.startConfigPortal(deviceId);  
   }
@@ -63,17 +64,18 @@ WiFiManagerParameter custom_http_port("httpPort", "http port", http_port, 6);
   if (((configCount > 1 && MqttClient.connected() && WiFi.status() == WL_CONNECTED) || (configCount > 1 && !MqttClient.connected() && WiFi.status() == WL_CONNECTED)) && manualConfig == false) { 
   //if ((configCount > 1 && _MQTT_client.connected() && WiFi.status() == WL_CONNECTED) || (configCount > 1 && !_MQTT_client.connected() && WiFi.status() == WL_CONNECTED)) {
     Serial.println(F("User config access"));
-    wifiManager.setConfigPortalTimeout(configTimeout);
+    wifiManager.setConfigPortalTimeout(configTimeout2);
     wifiManager.startConfigPortal(deviceId);  
   }
   
   // After first start or hard reset...
-  //else if (!wifiManager.autoConnect(deviceId, devicePass)) {
-  if (!wifiManager.autoConnect(deviceId)) {
-    Serial.println(F("Connection failure --> Timeout"));
-    delay(3000);
-   //reset and try again, or maybe put it to deep sleep
-    setReboot();
+  if (WiFi.status() != WL_CONNECTED) {
+    if (!wifiManager.autoConnect(deviceId)) {
+      Serial.println(F("Connection failure --> Timeout"));
+      delay(3000);
+     //reset and try again, or maybe put it to deep sleep
+      setReboot();
+    }
   }
 
   else {

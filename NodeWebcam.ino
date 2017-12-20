@@ -7,8 +7,8 @@
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>        
 #include <ESP8266httpUpdate.h>
-//#include <ESP8266WebServer.h>
-//#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <DNSServer.h>
 #include <WiFiManager.h> 
 #include <WiFiClientSecure.h> 
 #include <PubSubClient.h>
@@ -87,6 +87,7 @@ void checkButton() {
       Serial.println(F("Long push detected, ask for config"));
       manualConfig = true;
       configManager();
+      value == HIGH;
   }
 }
 
@@ -249,7 +250,6 @@ void before() {
     Serial.println(F("Failed to mount FS"));
   }
   ticker.detach();
-  configManager();
 
 }
 
@@ -290,11 +290,12 @@ void setup() {
     wifiManager.resetSettings();
   }
   
-  
   if (resetConfig) {
     setDefault(); 
   }
-  
+
+  getDeviceId();
+
   before();
   
   SPIFFS.begin();
@@ -410,26 +411,27 @@ void setup() {
   fileUsedKB = (int)fs_info.usedBytes;
 
   Serial.printf("setup heap size: %u\n", ESP.getFreeHeap());
-
-  getDeviceId();
-
-
   
+  configManager();
+  mqttInit();
+
 }
 
 void loop() {
 if ( ! executeOnce) {
     executeOnce = true; 
-   Serial.printf("loop heap size: %u\n", ESP.getFreeHeap());
-   mqttInit();
+   mqttReconnect();
   }
+  
+  checkButton();
 
   if (MqttClient.connected()) {
+    wifiFailCount = 0;
+    if (STATE_LED == LOW); digitalWrite(STATE_LED, HIGH);
     ticker.detach();
     MqttClient.loop();
     //yield();
     Capture();
-    checkButton();
         ///PREVOIR L'AJOUT D'UN SLEEP POUR USAGE SUR BATTERIE ??
     //if (battery == true) {
     //  sleep...
@@ -448,7 +450,7 @@ if ( ! executeOnce) {
   
   if (!MqttClient.connected()) {
     ticker.attach(0.3, tick);
- //   checkButton();
+    checkButton();
     mqttReconnect();
     if (mqttFailCount == 15) {
    //   mqttReconnect() = false;
@@ -457,13 +459,5 @@ if ( ! executeOnce) {
       mqttFailCount = 0;
       configManager();
      }
-  }
-  
-  if ((MqttClient.connected()) && (WiFi.status() == WL_CONNECTED)) { //WiFiMulti.run() == WL_CONNECTED
-    ticker.detach();
-    wifiFailCount = 0;
-    if (STATE_LED == LOW) {
-      digitalWrite(STATE_LED, HIGH);
-    }
   }
 }
